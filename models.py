@@ -25,6 +25,21 @@ def setup_db(app, database_path=database_path):
 
     db.create_all()
 
+
+def db_drop_and_create():
+    db.drop_all()
+    db.create_all()
+    insert_seed_records()
+
+
+def insert_seed_records():
+    actor1 = Actor(name="Dwayne Johnson", age=54, gender="Male")
+    actor1.insert()
+
+    movie1 = Movie(title="Jumanji", release_date=date.today())
+    movie1.insert()
+
+
 class Movie(db.Model):
     __tablename__ = "movies"
     id = Column(Integer, primary_key=True)
