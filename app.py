@@ -112,3 +112,84 @@ def create_app(test_config=None):
                 abort(404)
 
             abort(422)
+            
+    ''' Actors Endpoint '''
+
+    @app.route("/actors", methods=["GET"])
+    @requires_auth("get:actors")
+    def get_actors(payload):
+        actors = Actor.query.all()
+        if actors is None:
+            abort(404)
+
+        return jsonify({
+            "success": True,
+            "actors": [actor.format() for actor in actors]
+        })
+
+    @app.route("/actors", methods=["POST"])
+    @requires_auth("post:actors")
+    def create_actor(payload):
+        body = request.get_json()
+
+        if "name" and "age" and "gender" not in body:
+            abort(422)
+
+        name = body["name"]
+        age = body["age"]
+        gender = body["gender"]
+
+        actor = Actor(name=name, age=age, gender=gender)
+        actor.insert()
+
+        return jsonify({
+            "success": True,
+            "actors": [actor.format()]
+        })
+
+    @app.route("/actors/<int:actor_id>", methods=["PATCH"])
+    @requires_auth("patch:actors")
+    def update_actor(payload, actor_id):
+        body = request.get_json()
+
+        try:
+            actor = Actor.query.get(actor_id)
+
+            if actor is None or body is None:
+                abort(404)
+
+            else:
+                if "name" in body:
+                    actor.name = body["name"]
+                if "age" in body:
+                    actor.age = body["age"]
+                if "gender" in body:
+                    actor.gender = body["gender"]
+
+                actor.update()
+                updated_actor = Actor.query.get(actor_id)
+                return jsonify({
+                    "success": True,
+                    "actors": [updated_actor.format()]
+                })
+
+        except Exception as error:
+            abort(422)
+
+    @app.route("/actors/<int:actor_id>", methods=["DELETE"])
+    @requires_auth("delete:actors")
+    def delete_actor(payload, actor_id):
+        try:
+            actor = Actor.query.get(actor_id)
+            if actor is None:
+                abort(404)
+
+            return jsonify({
+                "success": True,
+                "delete": actor_id
+            })
+        except Exception as error:
+            if (error.code == 404):
+                abort(404)
+
+            abort(422)
