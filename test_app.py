@@ -37,7 +37,7 @@ class BoxofficeTestCase(unittest.TestCase):
         with self.app.app_context():
             self.db = SQLAlchemy()
             self.db.init_app(self.app)
-            # create all tables
+            
             self.db.create_all()
 
 
@@ -112,7 +112,7 @@ class BoxofficeTestCase(unittest.TestCase):
 
     
     ''' delete movie '''
-
+    
     def test_delete_movie(self):
         response = self.client().delete("/movies/1", headers=executive_producer_auth_header)
 
@@ -133,3 +133,103 @@ class BoxofficeTestCase(unittest.TestCase):
 
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 404)
+        
+        
+    ''' get actors '''
+    
+
+    def test_get_actors(self):
+        response = self.client().get("/actors", headers=casting_assistant_auth_header)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+        self.assertEqual(len(data["actors"]), 1)
+
+    def test_get_actors_not_authorized(self):
+        response = self.client().get("/movies")
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 401)
+
+    
+    ''' create actor '''
+    
+    def test_create_actor(self):
+        new_actor = {
+            "name": "Steve",
+            "age": 20,
+            "gender": "Male"
+        }
+        response = self.client().post("/actors", json=new_actor,
+                                      headers=casting_director_auth_header)
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+
+    def test_create_actor_not_authorized(self):
+        new_actor = {
+            "name": "Steve",
+            "age": 20,
+            "gender": "Male"
+        }
+        response = self.client().post("/actors", json=new_actor)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(data["message"], "Authorization header is expected.")
+        self.assertFalse(data["success"])
+
+    
+    ''' update actor '''
+    
+
+    def test_update_actor(self):
+        updated_actor = {"name": "Bill"}
+        response = self.client().patch("/actors/1", json=updated_actor,
+                                       headers=casting_director_auth_header)
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+
+    def test_update_actor_unauthorized(self):
+        updated_actor = {"name": "Bill"}
+        response = self.client().patch(
+            "/actors/1", json=updated_actor, headers=casting_assistant_auth_header)
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 401)
+        self.assertFalse(data["success"])
+
+    
+    ''' delete actor '''
+    
+    def test_delete_actor(self):
+        response = self.client().delete("/actors/1", headers=casting_director_auth_header)
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data["success"])
+
+    def test_delete_actor_unauthorized(self):
+        response = self.client().delete("/actors/1", headers=casting_assistant_auth_header)
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 401)
+        self.assertFalse(data["success"])
+
+    def test_delete_actor_not_found(self):
+        response = self.client().delete("/actors/5000", headers=casting_director_auth_header)
+
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code, 404)
+
+'''
+Make the tests conveniently executable.
+From app directory, run 'python test_app.py' to start tests 
+'''
+if __name__ == "__main__":
+    unittest.main()
+
