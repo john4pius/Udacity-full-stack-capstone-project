@@ -21,3 +21,21 @@ executive_producer_auth_header = {
 }
 
 
+class BoxofficeTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        self.app = create_app()
+        self.client = self.app.test_client
+
+        self.database_path = "postgres://{}/{}".format(
+            'localhost:5432', "agency_test")
+
+        setup_db(self.app, self.database_path)
+        db_drop_and_create()
+
+        with self.app.app_context():
+            self.db = SQLAlchemy()
+            self.db.init_app(self.app)
+            # create all tables
+            self.db.create_all()
