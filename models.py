@@ -7,7 +7,7 @@ from datetime import date
 database_path = os.environ.get('DATABASE_URL')
 
 if not database_path:
-    database_name = "boxoffice"
+    database_name = "moviecast"
     database_path = "postgres://{}/{}".format('localhost:5432', database_name)
 
 db = SQLAlchemy()

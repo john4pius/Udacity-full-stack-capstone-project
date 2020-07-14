@@ -1,7 +1,7 @@
 export AUTH0_DOMAIN=capstone-fsndp.us.auth0.com
 export API_AUDIENCE=moviecast
 export ALGORITHMS=['RS256']
-export DATABASE_URL=postgresql://postgres:agency@localhost:5432/boxoffice
+export DATABASE_URL=postgresql://postgres:agency@localhost:5432/moviecast
 
 
 export CASTING_ASSISTANT_TOKEN=
