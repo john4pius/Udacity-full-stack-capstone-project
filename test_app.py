@@ -28,8 +28,11 @@ class MoviecastTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
 
-        self.database_path = "postgres://{}/{}".format(
-            'localhost:5432', "moviecast")
+        ''' self.database_path = "postgres://{}/{}".format(
+            'localhost:5432', "moviecast") '''
+            
+        self.database_path = 'postgres://demorole1:password1@localhost:5432/moviecast'
+
 
         setup_db(self.app, self.database_path)
         db_drop_and_create()
@@ -63,7 +66,7 @@ class MoviecastTestCase(unittest.TestCase):
 
     def test_create_movie(self):
         new_movie = {
-            "title": "Titanic",
+            "title": "Marshal",
             "release_date": date.today()
         }
 
@@ -76,7 +79,7 @@ class MoviecastTestCase(unittest.TestCase):
 
     def test_create_movie_not_authorized(self):
         new_movie = {
-            "title": "Titanic",
+            "title": "Marshal",
             "release_date": date.today()
         }
 
